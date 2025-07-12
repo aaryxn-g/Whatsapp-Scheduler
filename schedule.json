@@ -1,1 +1,23 @@
-
+[
+  {
+    "type": "individual",
+    "recipient": "+919999999999",
+    "message": "🎉 Hello! This is a test message from my WhatsApp scheduler. It's working perfectly!",
+    "time": "2025-07-11 14:50",
+    "sent": false
+  },
+  {
+    "type": "group",
+    "recipient": "Family Group",
+    "message": "📅 Don't forget about our family dinner this weekend!",
+    "time": "2025-07-12 10:00",
+    "sent": false
+  },
+  {
+    "type": "individual",
+    "recipient": "9876543210",
+    "message": "⏰ Reminder: Your appointment is tomorrow at 3 PM. Please confirm!",
+    "time": "2025-07-12 18:00",
+    "sent": false
+  }
+]
