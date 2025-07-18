@@ -4,7 +4,7 @@ const fs = require('fs').promises;
 const path = require('path');
 
 class WhatsAppScheduler {
-    constructor() {
+    constructor(options = {}) {
         // Initialize WhatsApp client with session persistence
         this.client = new Client({
             authStrategy: new LocalAuth({
@@ -20,6 +20,10 @@ class WhatsAppScheduler {
         this.scheduleFile = './schedule.json';
         this.checkInterval = 60000; // 1 minute in milliseconds
         this.intervalId = null;
+        
+        // Configuration options
+        this.defaultCountryCode = options.defaultCountryCode || null; // No default country code
+        this.requireCountryCode = options.requireCountryCode !== false; // Default to true
         
         this.setupEventHandlers();
     }
@@ -134,6 +138,12 @@ class WhatsAppScheduler {
                 // Skip if already sent
                 if (message.sent) continue;
 
+                // Validate message data
+                if (!this.validateMessageData(message)) {
+                    console.error('❌ Invalid message data:', message);
+                    continue;
+                }
+
                 // Check if it's time to send this message
                 if (this.shouldSendMessage(message, currentTime)) {
                     console.log(`📤 Sending scheduled message to ${message.recipient}...`);
@@ -142,6 +152,7 @@ class WhatsAppScheduler {
                     
                     if (success) {
                         messages[i].sent = true;
+                        messages[i].sentAt = new Date().toISOString();
                         hasUpdates = true;
                         console.log(`✅ Message sent successfully to ${message.recipient}`);
                     } else {
@@ -158,6 +169,28 @@ class WhatsAppScheduler {
         } catch (error) {
             console.error('❌ Error checking scheduled messages:', error);
         }
+    }
+
+    /**
+     * Validate message data structure
+     * @param {Object} message - Message object
+     * @returns {boolean} True if valid
+     */
+    validateMessageData(message) {
+        const required = ['type', 'recipient', 'message', 'time'];
+        const hasRequired = required.every(field => message.hasOwnProperty(field));
+        
+        if (!hasRequired) {
+            console.error('❌ Message missing required fields:', required);
+            return false;
+        }
+
+        if (!['individual', 'group'].includes(message.type)) {
+            console.error('❌ Invalid message type. Must be "individual" or "group"');
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -241,7 +274,7 @@ class WhatsAppScheduler {
     }
 
     /**
-     * Format phone number for WhatsApp
+     * Format phone number for WhatsApp (International support)
      * @param {string} phoneNumber - Phone number
      * @returns {string} Formatted chat ID
      */
@@ -250,12 +283,39 @@ class WhatsAppScheduler {
             // Remove all non-digit characters
             let cleanNumber = phoneNumber.replace(/\D/g, '');
             
-            // Add country code if not present (assuming international format)
-            if (!cleanNumber.startsWith('91') && cleanNumber.length === 10) {
-                cleanNumber = '91' + cleanNumber; // Add India country code, modify as needed
+            // Handle different number formats
+            if (cleanNumber.length === 0) {
+                console.error('❌ Invalid phone number: empty after cleaning');
+                return null;
             }
-            
+
+            // If number already looks like it has country code (11+ digits), use as is
+            if (cleanNumber.length >= 11) {
+                return cleanNumber + '@c.us';
+            }
+
+            // If number is 10 digits and we have a default country code, add it
+            if (cleanNumber.length === 10 && this.defaultCountryCode) {
+                cleanNumber = this.defaultCountryCode + cleanNumber;
+                return cleanNumber + '@c.us';
+            }
+
+            // For numbers that don't fit standard patterns
+            if (cleanNumber.length < 10) {
+                console.error('❌ Phone number too short:', cleanNumber);
+                return null;
+            }
+
+            // If we require country code but don't have one, show error
+            if (this.requireCountryCode && cleanNumber.length === 10) {
+                console.error('❌ Country code required but not provided for:', cleanNumber);
+                console.log('💡 Tip: Include country code (e.g., 1234567890 for US should be 11234567890)');
+                return null;
+            }
+
+            // Use the number as is if we're not requiring country codes
             return cleanNumber + '@c.us';
+
         } catch (error) {
             console.error('❌ Error formatting phone number:', error);
             return null;
@@ -283,15 +343,20 @@ class WhatsAppScheduler {
     }
 
     /**
-     * Add a new scheduled message (utility method for future use)
+     * Add a new scheduled message
      * @param {Object} messageData - Message data
      */
     async addScheduledMessage(messageData) {
         try {
+            if (!this.validateMessageData(messageData)) {
+                throw new Error('Invalid message data');
+            }
+
             const messages = await this.loadScheduledMessages();
             messages.push({
                 ...messageData,
-                sent: false
+                sent: false,
+                createdAt: new Date().toISOString()
             });
             await this.saveScheduledMessages(messages);
             console.log('✅ Scheduled message added successfully');
@@ -299,11 +364,39 @@ class WhatsAppScheduler {
             console.error('❌ Error adding scheduled message:', error);
         }
     }
+
+    /**
+     * Get statistics about scheduled messages
+     */
+    async getStats() {
+        try {
+            const messages = await this.loadScheduledMessages();
+            const stats = {
+                total: messages.length,
+                sent: messages.filter(msg => msg.sent).length,
+                pending: messages.filter(msg => !msg.sent).length,
+                individual: messages.filter(msg => msg.type === 'individual').length,
+                group: messages.filter(msg => msg.type === 'group').length
+            };
+            
+            console.log('📊 Scheduler Statistics:', stats);
+            return stats;
+        } catch (error) {
+            console.error('❌ Error getting stats:', error);
+            return null;
+        }
+    }
 }
 
 // Main execution
 async function main() {
-    const scheduler = new WhatsAppScheduler();
+    // Configuration options
+    const options = {
+        // defaultCountryCode: '1',        // US country code (optional)
+        // requireCountryCode: true,       // Require country code for 10-digit numbers
+    };
+
+    const scheduler = new WhatsAppScheduler(options);
     
     // Handle graceful shutdown
     process.on('SIGINT', async () => {
