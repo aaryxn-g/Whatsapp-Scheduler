@@ -1,23 +1,32 @@
 [
   {
     "type": "individual",
-    "recipient": "+919999999999",
+    "recipient": "97150807xxxx",
     "message": "🎉 Hello! This is a test message from my WhatsApp scheduler. It's working perfectly!",
-    "time": "2025-07-11 14:50",
-    "sent": false
+    "time": "2025-07-18T06:15:00.000Z",
+    "sent": true,
+    "sentAt": "2025-07-18T06:15:34.860Z"
   },
   {
     "type": "group",
-    "recipient": "Family Group",
-    "message": "📅 Don't forget about our family dinner this weekend!",
-    "time": "2025-07-12 10:00",
-    "sent": false
+    "recipient": "Trip when",
+    "message": "xxxx",
+    "time": "2025-07-18T06:15:00.000Z",
+    "sent": true,
+    "sentAt": "2025-07-18T06:15:40.475Z"
   },
   {
     "type": "individual",
-    "recipient": "9876543210",
-    "message": "⏰ Reminder: Your appointment is tomorrow at 3 PM. Please confirm!",
-    "time": "2025-07-12 18:00",
-    "sent": false
+    "recipient": "971508xxx451",
+    "message": "⏰ This is another test message to verify the scheduler functionality.",
+    "time": "2025-07-18T11:25:00.000Z",
+    "sent": true
+  },
+  {
+    "type": "individual",
+    "recipient": "112xxx67890",
+    "message": "📱 Testing US number format - this should work perfectly!",
+    "time": "2025-07-18T11:27:00.000Z",
+    "sent": true
   }
 ]
