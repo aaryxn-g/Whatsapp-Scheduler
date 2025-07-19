@@ -1,1 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WhatsApp Scheduler</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      max-width: 800px;
+      margin: auto;
+      background-color: #f9f9f9;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #2e7d32;
+    }
+
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin-top: 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f1f1f1;
+    }
+
+    .multi-entry {
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📅 WhatsApp Message Scheduler</h1>
+
+  <form id="messageForm">
+    <div id="entries">
+      <!-- Message entry blocks will be added here -->
+    </div>
+    <button type="button" onclick="addEntry()">+ Add Another Message</button>
+    <button type="submit">📤 Schedule Messages</button>
+  </form>
+
+  <h2>📋 Scheduled Messages</h2>
+  <table id="messageTable">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Recipient</th>
+        <th>Message</th>
+        <th>Time</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Rows will go here -->
+    </tbody>
+  </table>
+
+  <script>
+    const form = document.getElementById('messageForm');
+    const entriesDiv = document.getElementById('entries');
+    const tableBody = document.querySelector('#messageTable tbody');
+
+    // Function to add a message input block
+    function addEntry() {
+      const container = document.createElement('div');
+      container.className = 'multi-entry';
+
+      container.innerHTML = `
+        <label>Type:</label>
+        <select name="type" required>
+          <option value="individual">Individual</option>
+          <option value="group">Group</option>
+        </select>
+
+        <label>Recipient:</label>
+        <input name="recipient" required>
+
+        <label>Message:</label>
+        <textarea name="message" required></textarea>
+
+        <label>Time (Local):</label>
+        <input type="datetime-local" name="time" required>
+      `;
+
+      entriesDiv.appendChild(container);
+    }
+
+    // Load scheduled messages and show them in table
+    async function loadScheduledMessages() {
+      const res = await fetch('/api/messages');
+      const data = await res.json();
+
+      tableBody.innerHTML = '';
+      data.forEach(msg => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${msg.type}</td>
+          <td>${msg.recipient}</td>
+          <td>${msg.message}</td>
+          <td>${new Date(msg.time).toLocaleString()}</td>
+          <td>${msg.sent ? '✅ Sent' : '⏳ Pending'}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Handle form submission
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const entries = [...entriesDiv.querySelectorAll('.multi-entry')];
+      for (const entry of entries) {
+        const inputs = entry.querySelectorAll('input, textarea, select');
+        const data = {};
+
+        inputs.forEach(input => {
+          data[input.name] = input.value;
+        });
+
+        data.time = new Date(data.time).toISOString(); // Convert to UTC
+
+        await fetch('/api/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+      }
+
+      alert('✅ All messages scheduled!');
+      entriesDiv.innerHTML = '';
+      addEntry();
+      loadScheduledMessages();
+    });
+
+    // Initial load
+    addEntry();
+    loadScheduledMessages();
+  </script>
+
+</body>
+</html>
 
