@@ -1,1 +1,29 @@
-
+[
+  {
+    "type": "individual",
+    "recipient": "918146xxxx21",
+    "message": "muahaha",
+    "time": "2025-07-19T06:40:00.000Z",
+    "sent": true,
+    "createdAt": "2025-07-19T06:38:56.386Z",
+    "sentAt": "2025-07-19T06:40:45.423Z"
+  },
+  {
+    "type": "group",
+    "recipient": "Trip when",
+    "message": "YES",
+    "time": "2025-07-19T06:40:00.000Z",
+    "sent": true,
+    "createdAt": "2025-07-19T06:39:21.285Z",
+    "sentAt": "2025-07-19T06:40:47.341Z"
+  },
+  {
+    "type": "individual",
+    "recipient": "918xxxx04421",
+    "message": "mahahah",
+    "time": "2025-07-19T06:48:00.000Z",
+    "sent": true,
+    "createdAt": "2025-07-19T06:47:13.483Z",
+    "sentAt": "2025-07-19T06:48:45.278Z"
+  }
+]
