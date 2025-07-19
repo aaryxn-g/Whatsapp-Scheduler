@@ -1,203 +1,237 @@
-# WhatsApp Message Scheduler
+Here is the complete, copy-paste-ready `README.md` content for your GitHub repository:
 
-A Node.js application that allows you to schedule WhatsApp messages to individuals and groups using the whatsapp-web.js library.
+---
 
-## Features
+````markdown
+# WhatsApp Message Scheduler 🕒
 
-- 📅 Schedule messages to individuals and groups
-- 🔄 Automatic message sending at specified times
-- 💾 Persistent session storage (no need to scan QR code repeatedly)
-- 📱 Support for both individual contacts and group chats
-- ⏰ Real-time message scheduling with minute-level precision
-- 🛡️ Graceful error handling and logging
-- 🔐 Secure authentication using WhatsApp Web
+A Node.js + Express.js + WhatsApp Web-based message scheduler with a user-friendly frontend to send scheduled messages to individuals and groups via WhatsApp.
 
-## Prerequisites
+> 💡 Built using [`whatsapp-web.js`](https://github.com/pedroslopez/whatsapp-web.js)
 
-- Node.js (version 14.0.0 or higher)
+---
+
+## 🚀 Features
+
+- 🧾 **Web Interface** for scheduling messages (no editing JSON manually)
+- 📱 Schedule WhatsApp messages to **individuals or groups**
+- 🕐 Set **date and time** (IST local) with real-time scheduling precision
+- 🔐 Secure WhatsApp authentication via QR
+- 💾 Persistent sessions (you scan once, and you're done)
+- ✅ Tracks **sent** vs **pending** messages
+- 📤 Logs all sent messages into `sent-log.json`
+- 🧠 Supports multiple message entries at once
+
+---
+
+## 🛠 Prerequisites
+
+- Node.js v14 or higher
 - npm (Node Package Manager)
-- WhatsApp account
-- Active internet connection
+- WhatsApp account (logged into your phone)
+- Internet connection
 
-## Installation
+---
 
-1. **Clone the repository:**
+## 📦 Installation
+
+1. **Clone the repository**
    ```bash
    git clone https://github.com/yourusername/whatsapp-scheduler.git
    cd whatsapp-scheduler
-   ```
+````
 
-2. **Install dependencies:**
+2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
-3. **Create a schedule file:**
-   The application will automatically create a `schedule.json` file on first run, but you can create it manually if needed.
+3. **Create empty schedule and log files**
 
-## Usage
+   ```bash
+   echo "[]" > schedule.json
+   echo "[]" > sent-log.json
+   ```
 
-### Starting the Application
+   > On Windows (PowerShell), use:
+
+   ```powershell
+   New-Item -Path . -Name "schedule.json" -ItemType "File"; Set-Content -Path schedule.json -Value "[]"
+   New-Item -Path . -Name "sent-log.json" -ItemType "File"; Set-Content -Path sent-log.json -Value "[]"
+   ```
+
+---
+
+## ▶️ Usage
+
+### 1. Start the app
 
 ```bash
 npm start
 ```
 
 Or for development with auto-restart:
+
 ```bash
 npm run dev
 ```
 
-### First Time Setup
+### 2. Authenticate WhatsApp
 
-1. Run the application
-2. Scan the QR code with your WhatsApp mobile app
-3. The application will authenticate and start monitoring for scheduled messages
-
-### Adding Scheduled Messages
-
-Edit the `schedule.json` file to add your scheduled messages:
-
-```json
-[
-  {
-    "type": "individual",
-    "recipient": "+1234567890",
-    "message": "Hello! This is a scheduled message.",
-    "time": "2025-07-12 14:30",
-    "sent": false
-  },
-  {
-    "type": "group",
-    "recipient": "Family Group",
-    "message": "Don't forget our meeting today!",
-    "time": "2025-07-12 09:00",
-    "sent": false
-  }
-]
-```
-
-### Message Format
-
-Each message object should contain:
-- `type`: Either "individual" or "group"
-- `recipient`: Phone number (with country code) for individuals, or exact group name for groups
-- `message`: The text message to send
-- `time`: When to send the message (YYYY-MM-DD HH:MM format)
-- `sent`: Boolean indicating if the message has been sent (automatically updated)
-
-### Phone Number Format
-
-For individual messages, use international format:
-- Include country code (e.g., +1 for US, +91 for India)
-- Example: "+1234567890" or "1234567890"
-- The app will automatically format Indian numbers if no country code is provided
-
-### Group Messages
-
-For group messages:
-- Use the exact group name as it appears in WhatsApp
-- The group name matching is case-insensitive
-- Make sure the bot account is a member of the group
-
-## Project Structure
-
-```
-whatsapp-scheduler/
-├── index.js              # Main application file
-├── package.json          # Project dependencies and scripts
-├── schedule.json         # Scheduled messages (auto-created)
-├── session_data/         # WhatsApp session data (auto-created)
-├── README.md            # This file
-└── .gitignore           # Git ignore file
-```
-
-## Configuration
-
-### Default Settings
-
-- **Check Interval**: 60 seconds (1 minute)
-- **Time Window**: Messages are sent within 1 minute of scheduled time
-- **Country Code**: Default is India (+91) for numbers without country code
-- **Session Path**: `./session_data`
-
-### Customization
-
-You can modify these settings in the `WhatsAppScheduler` constructor:
-
-```javascript
-this.checkInterval = 60000; // Check every minute
-this.scheduleFile = './schedule.json'; // Schedule file path
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **QR Code doesn't appear**
-   - Make sure your terminal supports QR code display
-   - Check if port 3000 is available
-
-2. **Authentication fails**
-   - Delete the `session_data` folder and restart
-   - Ensure your WhatsApp account is active
-
-3. **Messages not sending**
-   - Check if phone numbers are in correct format
-   - Verify group names are exact matches
-   - Ensure scheduled time is in the future
-
-4. **Group not found**
-   - Make sure the bot account is a member of the group
-   - Check group name spelling and case
-
-### Logs
-
-The application provides detailed logging:
-- ✅ Success messages
-- ❌ Error messages
-- 🔍 Debug information
-- 📤 Message sending status
-
-## Security Considerations
-
-- Keep your `session_data` folder secure
-- Don't share your session files
-- Use environment variables for sensitive data in production
-- Be mindful of WhatsApp's terms of service
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Disclaimer
-
-This project is not affiliated with WhatsApp or Meta. Use responsibly and in accordance with WhatsApp's Terms of Service. The authors are not responsible for any misuse of this software.
-
-## Support
-
-If you encounter any issues or have questions:
-1. Check the troubleshooting section
-2. Open an issue on GitHub
-3. Provide detailed error logs and system information
-
-## Roadmap
-
-- [ ] Web interface for managing scheduled messages
-- [ ] Google Sheets integration
-- [ ] Message templates
-- [ ] Recurring messages
-- [ ] Message delivery reports
-- [ ] Multiple WhatsApp account support
+* Open your terminal and **scan the QR code** using WhatsApp > Linked Devices
+* You’ll stay logged in as long as `session_data/` folder is intact
 
 ---
 
-⭐ If you find this project helpful, please give it a star on GitHub!
+## 🌐 Web Interface
+
+Once running, visit:
+👉 [http://localhost:3000](http://localhost:3000)
+
+### You can:
+
+* ✅ Add multiple messages in one go
+* ✍️ Select individual/group type
+* 📅 Pick date & time using a calendar/time input
+* 📄 View all **scheduled messages** in a table
+* 🔁 See live status: ✅ Sent or ⏳ Pending
+
+---
+
+## 📂 Message Format (JSON)
+
+Messages are stored in `schedule.json` like this:
+
+```json
+{
+  "type": "individual",
+  "recipient": "919123456789",
+  "message": "Good morning!",
+  "time": "2025-07-19T07:00:00.000Z",
+  "sent": false,
+  "createdAt": "2025-07-19T06:50:00.000Z"
+}
+```
+
+After being sent, they’re logged in `sent-log.json`:
+
+```json
+{
+  "type": "group",
+  "recipient": "Trip when",
+  "message": "YES",
+  "time": "2025-07-19T06:40:00.000Z",
+  "sent": true,
+  "createdAt": "2025-07-19T06:39:21.285Z",
+  "sentAt": "2025-07-19T06:40:47.341Z"
+}
+```
+
+---
+
+## 📞 Phone & Group Formats
+
+### ✅ Individual
+
+* Use international format: `919123456789` (no `+`)
+* Auto-handles formatting (adds `@c.us` internally)
+
+### ✅ Group
+
+* Use **exact group name** as seen in WhatsApp
+* Bot must be a member of the group
+
+---
+
+## 🧠 How It Works
+
+* Checks `schedule.json` every minute
+* If `message.time <= current time` and not sent:
+
+  * Sends message using `whatsapp-web.js`
+  * Updates status as `"sent": true`
+  * Logs into `sent-log.json`
+  * Removes it from `schedule.json` (clean-up)
+
+---
+
+## 🔐 Security Tips
+
+* Keep `session_data/` safe (don’t commit to GitHub)
+* Don’t expose on public servers without auth
+* Only send messages in line with WhatsApp's terms
+
+---
+
+## 🧪 Project Structure
+
+```
+whatsapp-scheduler/
+├── index.js             # Main scheduler + backend API
+├── schedule.json        # Future messages to be sent
+├── sent-log.json        # History of all sent messages
+├── session_data/        # WhatsApp session data
+├── public/
+│   └── index.html       # Web interface (frontend)
+├── package.json
+└── README.md
+```
+
+---
+
+## ❗ Troubleshooting
+
+### QR not showing?
+
+* Use a supported terminal
+* Delete `session_data/` and restart
+
+### Message not sending?
+
+* Check time format is valid ISO or use the frontend
+* Make sure phone number has correct country code
+* Group name must be exact (and bot must be in the group)
+
+---
+
+## 📈 Roadmap
+
+* [x] Frontend for message scheduling
+* [x] Support for multiple messages at once
+* [x] Message delivery log
+* [ ] Drag to reorder messages
+* [ ] Scheduled media (image/file)
+* [ ] Google Sheets integration
+* [ ] Recurring messages (e.g. daily, weekly)
+
+---
+
+## 🧑‍💻 Contributing
+
+1. Fork this repo
+2. Create a new branch: `git checkout -b feature/your-feature`
+3. Make your changes and commit: `git commit -m "add your feature"`
+4. Push: `git push origin feature/your-feature`
+5. Open a Pull Request!
+
+---
+
+## 📜 License
+
+MIT License — see the [LICENSE](LICENSE) file.
+
+---
+
+## 🚨 Disclaimer
+
+This is **not affiliated with WhatsApp or Meta**. Use this project responsibly and comply with all legal & ethical standards.
+The developer is **not responsible for misuse** of this tool.
+
+---
+
+## ⭐ Like this project?
+
+Give it a star ⭐ on GitHub — it helps others discover it and motivates further development!
+
+```
